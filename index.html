@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conversor Base64 / Imagem (Dark Mode)</title>
+    <style>
+        :root {
+            --primary: #e5a046;
+            --primary-hover: #0b7bfc;
+            --success: #22c55e;
+            --bg: #0f172a;
+            --card: #1e293b;
+            --border: #334155;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --input-bg: #0f172a;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            color: var(--text-main);
+            margin: 0;
+        }
+
+        .info-section {
+            background-color: var(--card);
+            padding: 25px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            margin-bottom: 30px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .grid { grid-template-columns: 1fr; }
+        }
+
+        .card {
+            background: var(--card);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+        }
+
+        h2 { color: var(--primary); margin-top: 0; }
+        
+        textarea {
+            width: 100%;
+            height: 150px;
+            padding: 12px;
+            background-color: var(--input-bg);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            resize: vertical;
+            box-sizing: border-box;
+            font-family: monospace;
+            font-size: 12px;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        input[type="file"] {
+            margin-bottom: 15px;
+            color: var(--text-muted);
+        }
+
+        input[type="file"]::-webkit-file-upload-button {
+            background: var(--border);
+            color: var(--text-main);
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+            margin-top: 10px;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+
+        button:hover { background-color: var(--primary-hover); }
+        button:active { transform: scale(0.98); }
+
+        .preview-area {
+            margin-top: 15px;
+            border: 2px dashed var(--border);
+            padding: 10px;
+            text-align: center;
+            min-height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            background-color: var(--input-bg);
+        }
+
+        .preview-area img {
+            max-width: 100%;
+            max-height: 250px;
+            border-radius: 4px;
+        }
+
+        ul { margin: 5px 0 0 0; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Conversor de Imagem ⇄ Base64</h1>
+    </header>
+
+    <section class="info-section">
+        <h2>O que é Base64?</h2>
+        <p style="color: var(--text-muted);">O <strong>Base64</strong> é um método para codificar dados binários (como imagens, PDFs ou áudios) em uma sequência de caracteres de texto ASCII. Ele transforma os bytes do arquivo em um texto legível que pode ser facilmente transferido ou armazenado onde apenas textos são aceitos.</p>
+        
+        <hr style="border: 0; border-top: 1px solid var(--border); margin: 25px 0;">
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div>
+                <strong style="color: #4ade80;">🟢 Quando UTILIZAR:</strong>
+                <ul style="padding-left: 20px; font-size: 14px; color: var(--text-muted);">
+                    <li><strong>Ícones e imagens pequenas:</strong> Ótimo para embutir logotipos pequenos ou ícones diretamente no HTML/CSS, reduzindo as requisições do site.</li>
+                    <li><strong>Sistemas offline:</strong> Útil quando o app precisa rodar sem internet e carregar recursos locais guardados em bancos internos.</li>
+                </ul>
+            </div>
+            <div>
+                <strong style="color: #f87171;">🔴 Quando NÃO utilizar:</strong>
+                <ul style="padding-left: 20px; font-size: 14px; color: var(--text-muted);">
+                    <li><strong>Imagens grandes/médias:</strong> O Base64 aumenta o tamanho do arquivo em cerca de <strong>33%</strong>. Fotos grandes vão inflar o banco e deixar tudo lento.</li>
+                    <li><strong>Imagens repetitivas:</strong> O navegador não consegue fazer cache da imagem de forma eficiente se ela estiver solta no código.</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <div class="grid">
+        
+        <div class="card">
+            <h2>Imagem para Base64</h2>
+            <p style="font-size: 14px; color: var(--text-muted); margin-top: 0;">Selecione uma imagem para transformá-la em código.</p>
+            <input type="file" id="inputImagem" accept="image/*">
+            <textarea id="txtBase64Resultado" readonly placeholder="O código Base64 aparecerá aqui..."></textarea>
+            <button id="btnCopiar" onclick="copiarTexto()">Copiar Código</button>
+        </div>
+
+        <div class="card">
+            <h2>Base64 para Imagem</h2>
+            <p style="font-size: 14px; color: var(--text-muted); margin-top: 0;">Cole o código Base64 abaixo para restaurar a imagem.</p>
+            <textarea id="txtBase64Input" placeholder="Cole o código aqui (incluindo o 'data:image/...;base64,')"></textarea>
+            <button onclick="converterParaImagem()">Converter para Imagem</button>
+            <div class="preview-area" id="previewContainer">
+                <span style="color: var(--text-muted);" id="placeholderText">A imagem restaurada aparecerá aqui</span>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    // --- 1. PROCESSO: IMAGEM PARA BASE64 ---
+    document.getElementById('inputImagem').addEventListener('change', function(e) {
+        const arquivo = e.target.files[0];
+        if (!arquivo) return;
+
+        const leitor = new FileReader();
+        
+        leitor.onload = function(evento) {
+            document.getElementById('txtBase64Resultado').value = evento.target.result;
+        };
+
+        leitor.readAsDataURL(arquivo);
+    });
+
+    // Função para copiar o texto com feedback visual discreto (sem alertas na tela)
+    function copiarTexto() {
+        const campoTexto = document.getElementById('txtBase64Resultado');
+        const btnCopiar = document.getElementById('btnCopiar');
+        
+        if(!campoTexto.value) return;
+        
+        campoTexto.select();
+        navigator.clipboard.writeText(campoTexto.value);
+        
+        // Feedback visual no botão
+        const textoOriginal = btnCopiar.innerText;
+        btnCopiar.innerText = "✓ Copiado!";
+        btnCopiar.style.backgroundColor = "var(--success)";
+        
+        // Reseta o botão após 2 segundos
+        setTimeout(() => {
+            btnCopiar.innerText = textoOriginal;
+            btnCopiar.style.backgroundColor = "var(--primary)";
+        }, 2000);
+    }
+
+
+    // --- 2. PROCESSO CONTRÁRIO: BASE64 PARA IMAGEM ---
+    function converterParaImagem() {
+        const codigoBase64 = document.getElementById('txtBase64Input').value.trim();
+        const previewContainer = document.getElementById('previewContainer');
+
+        if (!codigoBase64) return;
+
+        previewContainer.innerHTML = '';
+
+        const novaImagem = new Image();
+        novaImagem.src = codigoBase64;
+        
+        novaImagem.onerror = function() {
+            previewContainer.innerHTML = '<span style="color: #f87171;">Erro: Código Base64 inválido ou corrompido.</span>';
+        };
+
+        novaImagem.onload = function() {
+            previewContainer.appendChild(novaImagem);
+        };
+    }
+</script>
+
+</body>
+</html>
